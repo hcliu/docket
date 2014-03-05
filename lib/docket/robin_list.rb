@@ -1,3 +1,5 @@
+# adapted from https://github.com/bangthetable/CircularList
+
 module Docket
   class RobinList
     def initialize(array)

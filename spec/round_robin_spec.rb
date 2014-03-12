@@ -42,6 +42,23 @@ describe Docket::RoundRobin do
       round_robin.perform("trainer_15", action)
       expect(@animal_to_train).to eql('tiger')
     end
+
+    it "works with arrays of arrays" do
+      action = lambda { |robin| @robins = robin }
+
+      round_robin.set("trainer_15", [['dog', 'lion', 'tiger'], ['cages', 'sidewalks', 'bathrooms']])
+
+      round_robin.perform("trainer_15", action)
+      expect(@robins).to eql(['cages', 'sidewalks', 'bathrooms'])
+      round_robin.perform("trainer_15", action)
+      expect(@robins).to eql(['dog', 'lion', 'tiger'])
+
+      round_robin.set("trainer_16", [['kids', 'adults']])
+      round_robin.perform("trainer_16", action)
+      expect(@robins).to eql(['kids', 'adults'])
+      round_robin.perform("trainer_16", action)
+      expect(@robins).to eql(['kids', 'adults'])
+    end
   end
 
 end

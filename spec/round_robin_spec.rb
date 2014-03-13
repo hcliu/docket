@@ -5,9 +5,52 @@ describe Docket::RoundRobin do
   let(:round_robin) { Docket::RoundRobin.new(:storage => $storage) }
 
   describe '#set' do
+
+    before :all do
+      $storage.send(:clear!)
+    end
+
     it 'sets a list of robins for some identifier key' do
       round_robin.set("trainer_15", ['dog', 'lion', 'tiger'])
       expect($storage.db.get('trainer_15')).to be_kind_of(Array)
+    end
+
+    context "using group" do
+      before :each do
+        round_robin.set("trainer_15", ['dog', 'lion', 'tiger'], :group => 'group1')
+        reload_storage_connection
+      end
+      
+      it "writes to the group list" do
+        expect($storage.read("group1")).to eql(['trainer_15'])
+      end
+
+      it "creates its own index of groups" do
+        expect($storage.read("trainer_15_groups")).to eql(['group1'])
+      end
+    end
+  end
+
+  describe '#unset' do
+
+    before :each do
+      $storage.send(:clear!)
+      round_robin.set("trainer_15", ['dog', 'lion', 'tiger'], :group => "daily")
+      round_robin.set("trainer_16", ['cat', 'mouse', 'cheese'], :group => "daily")
+      round_robin.unset("trainer_15")
+    end
+
+    it "removes the list of groups associated" do
+      expect($storage.read('daily')).to_not include("trainer_15")
+      expect($storage.read('daily')).to include("trainer_16")
+    end
+
+    it "removes index of groups" do
+      expect($storage.read("trainer_15_groups")).to be_nil
+    end
+
+    it "removes the identifier" do
+      expect($storage.read("trainer_15")).to be_nil
     end
   end
 

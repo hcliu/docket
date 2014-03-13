@@ -25,17 +25,6 @@ describe Docket::Storage do
 
       expect($storage.db.keys.size).to eql(1)
     end
-
-    context "using group" do
-      it "writes key to the group list" do
-        $storage.save 'key1_group', 'value1', :group => "test_group1"
-
-        reload_storage_connection
-        
-
-        expect($storage.read("test_group1")).to eql(['key1_group'])
-      end
-    end
   end
 
   describe '#read' do

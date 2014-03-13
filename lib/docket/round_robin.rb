@@ -15,8 +15,27 @@ module Docket
       robin = _next_robin identifier
       action.call(robin)
     end
+
+    def unset identifier
+      unset_key identifier
+      unset_from_groups identifier
+    end
   
     protected
+
+    def unset_key identifier
+      storage.remove identifier
+    end
+
+    def unset_from_groups identifier
+      groups = storage.read("#{identifier}_groups")
+      groups.each do |group|
+        old_group = storage.read(group)
+        storage.save(group, old_group.reject { |item| item == identifier })
+      end
+
+      storage.remove "#{identifier}_groups"
+    end
 
     def _next_robin identifier
       list = storage.read(identifier) || []
@@ -31,7 +50,9 @@ module Docket
     def _set identifier, robins, options={}
       list = options[:list] || robins
 
-      storage.save(identifier, list, options)
+      storage.save(identifier, list)
+      storage.append(options[:group], identifier) if options[:group]
+      storage.append("#{identifier}_groups", options[:group]) if options[:group]
     end
 
   end

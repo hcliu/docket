@@ -52,6 +52,12 @@ describe Docket::RoundRobin do
     it "removes the identifier" do
       expect($storage.read("trainer_15")).to be_nil
     end
+
+    context 'when key not set' do
+      it 'does not raise an error' do
+        round_robin.unset("trainer_not_exists")
+      end
+    end
   end
 
   describe '#perform' do

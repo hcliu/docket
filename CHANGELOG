@@ -1,0 +1,6 @@
+Version 0.1.2:
+  General:
+    - Start of Changelog
+  Round Robin:
+    - Removing non-set keys no longer throws error
+    - Removed '_' from private method names

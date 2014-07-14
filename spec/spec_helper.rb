@@ -1,10 +1,9 @@
 require 'docket'
-require 'pry'
 require 'fakeredis'
 
 $storage = Docket::Storage::Daybreak.new('/tmp/docket_spec.rb')
 RSpec.configure do |config|
-  config.color_enabled = true
+  config.color = true
   config.formatter = 'documentation'
   config.order = 'random'
 

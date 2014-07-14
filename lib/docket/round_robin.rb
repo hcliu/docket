@@ -4,7 +4,7 @@ module Docket
     attr_accessor :storage
 
     def initialize args={}
-      @storage = args[:storage] || Docket::Storage.new('/tmp/docket.rb')
+      @storage = args[:storage] || Docket.configuration.storage || Docket::Storage::Daybreak.new('/tmp/docket.rb')
     end
 
     def set identifier, robins, options={}
@@ -14,11 +14,16 @@ module Docket
     def perform identifier, action
       robin = next_robin identifier
       action.call(robin)
+      robin
     end
 
     def unset identifier
       unset_key identifier
       unset_from_groups identifier
+    end
+
+    def reset!
+      storage.clear!
     end
   
     protected

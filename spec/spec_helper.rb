@@ -1,8 +1,8 @@
 require 'docket'
 require 'pry'
+require 'fakeredis'
 
-$storage = Docket::Storage.new('/tmp/docket_spec.rb')
-
+$storage = Docket::Storage::Daybreak.new('/tmp/docket_spec.rb')
 RSpec.configure do |config|
   config.color_enabled = true
   config.formatter = 'documentation'
@@ -19,8 +19,8 @@ RSpec.configure do |config|
 end
 
 def reload_storage_connection
-  if $storage && !$storage.db.closed?
+  if $storage && !$storage.closed?
     $storage.close
-    $storage = Docket::Storage.new('/tmp/docket_spec.rb')
+    $storage = Docket::Storage::Daybreak.new('/tmp/docket_spec.rb')
   end
 end

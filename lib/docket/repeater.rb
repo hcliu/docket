@@ -14,7 +14,7 @@ module Docket
       @scheduler              = args[:scheduler] || Rufus::Scheduler.new
       @scheduler_action       = args[:scheduler_action]
       @scheduler_set_callback = args[:scheduler_set_callback] || lambda {|scheduler|}
-      @storage                = args[:storage] || Docket::Storage.new('/tmp/docket.rb')
+      @storage                = args[:storage] || Docket.configuration.storage || Docket::Storage::Daybreak.new('/tmp/docket.rb')
       @repeat                 = args[:repeat]
     end
 

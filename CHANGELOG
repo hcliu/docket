@@ -1,3 +1,10 @@
+Version 0.2.0:
+  General:
+    - Added support for configuration
+  Storage:
+    - Added support for Redis (which uses MessagePack)
+    - Organizational changes (Docket::Storage module added)
+
 Version 0.1.2:
   General:
     - Start of Changelog

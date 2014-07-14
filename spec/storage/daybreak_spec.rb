@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Docket::Storage do
+describe Docket::Storage::Daybreak do
 
   describe '#new' do
     it 'creates the storage backend' do

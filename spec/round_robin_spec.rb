@@ -2,17 +2,24 @@ require 'spec_helper'
 
 describe Docket::RoundRobin do
 
-  let(:round_robin) { Docket::RoundRobin.new(:storage => $storage) }
+  before(:all) do
+    @storage = Docket::Storage::Redis.new
+    Docket.configure do |config|
+      config.storage = @storage
+    end
+  end
+
+  let(:round_robin) { Docket::RoundRobin.new }
 
   describe '#set' do
 
     before :all do
-      $storage.send(:clear!)
+      @storage.clear!
     end
 
     it 'sets a list of robins for some identifier key' do
       round_robin.set("trainer_15", ['dog', 'lion', 'tiger'])
-      expect($storage.db.get('trainer_15')).to be_kind_of(Array)
+      expect(@storage.read('trainer_15')).to be_kind_of(Array)
     end
 
     context "using group" do
@@ -22,11 +29,11 @@ describe Docket::RoundRobin do
       end
       
       it "writes to the group list" do
-        expect($storage.read("group1")).to eql(['trainer_15'])
+        expect(@storage.read("group1")).to eql(['trainer_15'])
       end
 
       it "creates its own index of groups" do
-        expect($storage.read("trainer_15_groups")).to eql(['group1'])
+        expect(@storage.read("trainer_15_groups")).to eql(['group1'])
       end
     end
   end
@@ -34,23 +41,23 @@ describe Docket::RoundRobin do
   describe '#unset' do
 
     before :each do
-      $storage.send(:clear!)
+      @storage.clear!
       round_robin.set("trainer_15", ['dog', 'lion', 'tiger'], :group => "daily")
       round_robin.set("trainer_16", ['cat', 'mouse', 'cheese'], :group => "daily")
       round_robin.unset("trainer_15")
     end
 
     it "removes the list of groups associated" do
-      expect($storage.read('daily')).to_not include("trainer_15")
-      expect($storage.read('daily')).to include("trainer_16")
+      expect(@storage.read('daily')).to_not include("trainer_15")
+      expect(@storage.read('daily')).to include("trainer_16")
     end
 
     it "removes index of groups" do
-      expect($storage.read("trainer_15_groups")).to be_nil
+      expect(@storage.read("trainer_15_groups")).to be_nil
     end
 
     it "removes the identifier" do
-      expect($storage.read("trainer_15")).to be_nil
+      expect(@storage.read("trainer_15")).to be_nil
     end
 
     context 'when key not set' do
@@ -86,7 +93,7 @@ describe Docket::RoundRobin do
 
       reload_storage_connection
       
-      round_robin = Docket::RoundRobin.new(:storage => $storage)
+      round_robin = Docket::RoundRobin.new(:storage => @storage)
 
       round_robin.perform("trainer_15", action)
       expect(@animal_to_train).to eql('tiger')
